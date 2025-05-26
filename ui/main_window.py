@@ -1,7 +1,12 @@
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QFileDialog
+from PySide6.QtWidgets import (QApplication, QTabWidget, QWidget, QVBoxLayout, 
+                               QPushButton, QLabel, QSizePolicy, QFileDialog)
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QIcon, QGuiApplication # 导入QGuiApplication用于获取屏幕信息
+from utils.excel_handler import ExcelHandler
+from database.db_manager import DatabaseManager
+from .tools_tab import ToolTab
+from .quick_start_tab import QuickStart
 
 class MainWindow(QWidget):
     def __init__(self):
@@ -36,30 +41,15 @@ class MainWindow(QWidget):
         self.move(x, y)
 
     def setup_ui(self):
-        # 主布局
-        main_layout = QVBoxLayout()
-        main_layout.setAlignment(Qt.AlignCenter) # 整体居中
+        layout = QVBoxLayout(self)
 
-        # 欢迎信息
-        welcome_label = QLabel("欢迎使用绝缘工器具试验报告打印系统！")
-        welcome_label.setFont(QFont("Inter", 18, QFont.Bold))
-        welcome_label.setAlignment(Qt.AlignCenter)
-        welcome_label.setStyleSheet("color: #007BFF; margin-bottom: 20px;") # Primary Color
-        main_layout.addWidget(welcome_label)
-
-        # 简要功能介绍
-        intro_label = QLabel("通过以下快速入口开始您的工作：")
-        intro_label.setFont(QFont("Inter", 12))
-        intro_label.setAlignment(Qt.AlignCenter)
-        intro_label.setStyleSheet("color: #343A40; margin-bottom: 30px;") # Neutral Dark Color
-        main_layout.addWidget(intro_label)
-
-        # 创建大按钮/卡片
-        self.create_button("导入 Excel 文件", self.import_excel, main_layout)
-        self.create_button("查看已导入数据", self.view_data, main_layout)
-        self.create_button("开始生成报告", self.generate_report, main_layout)
-
-        self.setLayout(main_layout)
+        self.tab_widget = QTabWidget()
+        self.tab_widget.setFont(QFont("Microsoft YaHei", 10))
+        self.quick_tab = QuickStart(ExcelHandler, DatabaseManager)
+        self.tool_tab = ToolTab()
+        self.tab_widget.addTab(self.quick_tab, "快速开始")
+        self.tab_widget.addTab(self.tool_tab, "工器具表")
+        layout.addWidget(self.tab_widget)
 
         # 设置全局样式
         self.setStyleSheet("""
@@ -86,30 +76,20 @@ class MainWindow(QWidget):
                 background-color: #DEE2E6; /* Even darker when pressed */
             }
         """)
+                # 连接信号和槽
+        self.tab_widget.currentChanged.connect(self.on_tab_changed)
 
-    def create_button(self, text, slot, layout):
-        button = QPushButton(text)
-        button.clicked.connect(slot)
-        # 设置按钮的尺寸策略，使其在布局中可以根据内容调整，并尝试占据可用空间
-        button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
-        layout.addWidget(button, alignment=Qt.AlignCenter) # 按钮在布局中也居中
 
-    def import_excel(self):
-        # 实际应用中会触发文件选择对话框
-        print("导入 Excel 文件功能被点击")
-        # 这里可以添加文件选择对话框的代码，例如：
-        file_path, _ = QFileDialog.getOpenFileName(self, "选择 Excel 文件", "", "Excel Files (*.xlsx *.xls)")
-        if file_path:
-            print(f"选择了文件: {file_path}")
-            # 导入成功后，切换到数据预览标签页
-        #     # self.parent().switch_tab("数据预览") # 假设父窗口有切换标签页的方法
+    def on_tab_changed(self, index):
+        """选项卡切换事件处理
 
-    def view_data(self):
-        print("查看已导入数据功能被点击")
-        # 实际应用中会切换到数据预览标签页
-        # self.parent().switch_tab("数据预览")
+        Args:
+            index: 选项卡索引
+        """
+        # 刷新当前选项卡的数据
+        current_tab = self.tab_widget.widget(index)
+        if hasattr(current_tab, 'refresh_data'):
+            current_tab.refresh_data()
 
-    def generate_report(self):
-        print("开始生成报告功能被点击")
-        # 实际应用中会切换到报告生成与打印标签页
-        # self.parent().switch_tab("报告生成与打印")
+
+
