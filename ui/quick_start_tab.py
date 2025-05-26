@@ -46,7 +46,7 @@ class QuickStart(QWidget):
         file_path, _ = QFileDialog.getOpenFileName(self, "选择 Excel 文件", "", "Excel Files (*.xlsx *.xls)")
         if file_path:
             print(f"选择了文件: {file_path}")
-            db_mag = self.DatabaseManager()
+            db_mag = self.DatabaseManager
             excel_hand = self.ExcelHandler(file_path, db_mag.conn)
             excel_hand.handler()
             # 导入成功后，切换到数据预览标签页

@@ -27,6 +27,7 @@ class MainWindow(QWidget):
         # 使窗口居中
         self.center_window()
 
+        self.db_manager = DatabaseManager() # 创建 DatabaseManager 实例
         self.setup_ui()
 
     def center_window(self):
@@ -45,8 +46,8 @@ class MainWindow(QWidget):
 
         self.tab_widget = QTabWidget()
         self.tab_widget.setFont(QFont("Microsoft YaHei", 10))
-        self.quick_tab = QuickStart(ExcelHandler, DatabaseManager)
-        self.tool_tab = ToolTab()
+        self.quick_tab = QuickStart(ExcelHandler, self.db_manager) # 传递实例
+        self.tool_tab = ToolTab(self.db_manager) # 传递实例
         self.tab_widget.addTab(self.quick_tab, "快速开始")
         self.tab_widget.addTab(self.tool_tab, "工器具表")
         layout.addWidget(self.tab_widget)
