@@ -30,12 +30,8 @@ class ToolTab(QWidget):
 
         self.table_view = QTableView()
         self.table_view.setModel(self.model)
-
-        # 允许排序（回答你刚才的思考题）
         self.table_view.setSortingEnabled(True)
 
         layout.addWidget(self.table_view)
 
-
-        # self.setCentralWidget(self.table_view)
 

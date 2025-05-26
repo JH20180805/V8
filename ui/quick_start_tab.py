@@ -1,7 +1,6 @@
-from PySide6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QFileDialog
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QFileDialog
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont, QIcon, QGuiApplication # 导入QGuiApplication用于获取屏幕信息
-
+from PySide6.QtGui import QFont
 
 class QuickStart(QWidget):
     def __init__(self, ExcelHandler, DatabaseManager):

@@ -18,5 +18,5 @@ class ExcelHandler:
 
     def handler(self):
         df = pd.read_excel(self.file_path)
-        print(df.head())
+        # print(df.head())
         df.to_sql(name="tools", con=self.conn,if_exists='replace', index=False)
