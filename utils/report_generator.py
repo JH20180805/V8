@@ -48,40 +48,40 @@ class ReportGenerator:
         Returns:
             生成的报告文件路径
         """
+        pass
+
+        # # 获取模板路径
+        # template_path = self.get_template_path(sample_name)
+
+        # # 加载模板
+        # doc = DocxTemplate(template_path)
 
 
-        # 获取模板路径
-        template_path = self.get_template_path(sample_name)
-
-        # 加载模板
-        doc = DocxTemplate(template_path)
-
-
-        # 准备上下文数据
-        context = {
-            '委托单位': unit,
-            '检测日期': test_date,
-            '温度': batch_data[0]['temperature'],
-            '湿度': batch_data[0]['humidity'],
-            '报告编号': report_number,
-            'rows': [],  # 样品列表
-            '样品名称': sample_name,
-            '试验数据': test_date,
-            '外观检查': batch_data[0].get('外观检查', ""),
-        }
+        # # 准备上下文数据
+        # context = {
+        #     '委托单位': unit,
+        #     '检测日期': test_date,
+        #     '温度': batch_data[0]['temperature'],
+        #     '湿度': batch_data[0]['humidity'],
+        #     '报告编号': report_number,
+        #     'rows': [],  # 样品列表
+        #     '样品名称': sample_name,
+        #     '试验数据': test_date,
+        #     '外观检查': batch_data[0].get('外观检查', ""),
+        # }
 
 
 
-        # 添加当前日期
-        context['报告盖章日期'] = datetime.datetime.now().strftime("%Y.%m.%d")
+        # # 添加当前日期
+        # context['报告盖章日期'] = datetime.datetime.now().strftime("%Y.%m.%d")
 
-        # 渲染模板
-        doc.render(context)
+        # # 渲染模板
+        # doc.render(context)
 
-        # 生成报告文件名
+        # # 生成报告文件名
 
 
-        # 保存报告
-        doc.save(report_path)
+        # # 保存报告
+        # doc.save(report_path)
 
-        return report_path
+        # return report_path
