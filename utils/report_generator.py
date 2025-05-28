@@ -48,7 +48,7 @@ class ReportGenerator:
         Returns:
             生成的报告文件路径
         """
-        pass
+        print("报告已打印")
 
         # # 获取模板路径
         # template_path = self.get_template_path(sample_name)

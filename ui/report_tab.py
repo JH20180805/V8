@@ -13,10 +13,10 @@ class ReportTab(QWidget):
         super().__init__()
 
         self.databasemanger = DatabaseManager
-        df = pd.read_sql("tools", self.databasemanger.conn)
+        df = pd.read_sql("SELECT * FROM tools", self.databasemanger.conn)
         units = df["委托单位"].unique()
         tool_names = df["样品名称"].unique()
-        receive_time = df["接收时间"].unique()
+        receive_time = df["接收日期"].unique()
 
 
         layout = QGridLayout()
@@ -27,13 +27,13 @@ class ReportTab(QWidget):
         l2 = QLabel("样品名称")
         t2 = QComboBox()
         t2.addItems(tool_names)
-        l3 = QLabel("接收时间")
+        l3 = QLabel("接收日期")
         t3 = QComboBox()
         t3.addItems(receive_time)
         l4 = QPushButton("打印")
-        l4.clicked.connect(self.generate())
+        l4.clicked.connect(self.generate)
 
-        df_new = df["委托单位"==t1.textActivated & "样品名称"==t2.textActivated & "接收时间"==t3.textActivated]
+        df_new = df[(df["委托单位"]==t1.currentText()) & (df["样品名称"]==t2.currentText()) & (df["接收日期"]==t3.currentText())]
         print(df_new)
         
         layout.addWidget(l1, 0, 0)
