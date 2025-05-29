@@ -48,7 +48,7 @@ class ReportTab(QWidget):
         label = QLabel("试验批次：")
         selec = QComboBox()
         view = QTableView()
-        for key, value in dic.items():
+        for key, _ in dic.items():
             selec.addItem(str(key), key)  # 第二个参数存储原始的元组键
 
         # 连接ComboBox选择变化信号
@@ -57,9 +57,13 @@ class ReportTab(QWidget):
             if current_key and current_key in dic:
                 model = PandasModel(dic[current_key])
                 view.setModel(model)
-        
+                self.key = selec.currentData()
+                self.value = dic[self.key]
+
         selec.currentTextChanged.connect(update_table)
-        
+        # self.key = selec.currentData()
+        # self.value = dic[self.key]
+
         # 初始化时设置第一个选项的模型
         if dic:  # 确保字典不为空
             first_key = list(dic.keys())[0]
@@ -90,5 +94,5 @@ class ReportTab(QWidget):
         self.setLayout(layout)
 
     def generate(self):
-        self.generator = ReportGenerator()
+        self.generator = ReportGenerator(self.key, self.value)
         self.generator.generate_report()
