@@ -42,6 +42,14 @@ class MainWindow(QWidget):
         # 移动窗口到计算出的位置
         self.move(x, y)
 
+    def switch_tab(self, tab_name):
+    # """切换到指定名称的选项卡"""
+        for i in range(self.tab_widget.count()):
+            if self.tab_widget.tabText(i) == tab_name:
+                self.tab_widget.setCurrentIndex(i)
+                return True
+        return False
+
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
@@ -51,9 +59,10 @@ class MainWindow(QWidget):
         self.tool_tab = ToolTab(self.db_manager) # 传递实例
         self.report_tab = ReportTab(self.db_manager) # 传递实例
         self.tab_widget.addTab(self.quick_tab, "快速开始")
-        self.tab_widget.addTab(self.tool_tab, "工器具表")
-        self.tab_widget.addTab(self.report_tab, "打印报告")
+        self.tab_widget.addTab(self.tool_tab, "数据预览")
+        self.tab_widget.addTab(self.report_tab, "报告打印")
         layout.addWidget(self.tab_widget)
+
 
         # 设置全局样式
         self.setStyleSheet("""

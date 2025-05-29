@@ -31,6 +31,16 @@ class QuickStart(QWidget):
         self.create_button("开始生成报告", self.generate_report, main_layout)
 
         self.setLayout(main_layout)
+    
+    def get_main_window(self):
+            """向上遍历父对象直到找到MainWindow实例"""
+            parent = self.parent()
+            while parent is not None:
+                # 检查是否是MainWindow（通过特定属性判断）
+                if hasattr(parent, 'tab_widget') and hasattr(parent, 'switch_tab'):
+                    return parent
+                parent = parent.parent()
+            return None
 
     def create_button(self, text, slot, layout):
         button = QPushButton(text)
@@ -38,6 +48,7 @@ class QuickStart(QWidget):
         # 设置按钮的尺寸策略，使其在布局中可以根据内容调整，并尝试占据可用空间
         button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         layout.addWidget(button, alignment=Qt.AlignCenter) # 按钮在布局中也居中
+    
     def import_excel(self):
         # 实际应用中会触发文件选择对话框
         print("导入 Excel 文件功能被点击")
@@ -48,15 +59,27 @@ class QuickStart(QWidget):
             db_mag = self.DatabaseManager
             excel_hand = self.ExcelHandler(file_path, db_mag.conn)
             excel_hand.handler()
-            # 导入成功后，切换到数据预览标签页
-        #     # self.parent().switch_tab("数据预览") # 假设父窗口有切换标签页的方法
+            # 使用更可靠的方式切换选项卡
+            main_window = self.get_main_window()
+            if main_window:
+                main_window.switch_tab("数据预览")  # 确保名称完全匹配
+            else:
+                print("错误：无法找到主窗口")
 
     def view_data(self):
         print("查看已导入数据功能被点击")
         # 实际应用中会切换到数据预览标签页
-        # self.parent().switch_tab("数据预览")
+        main_window = self.get_main_window()
+        if main_window:
+            main_window.switch_tab("数据预览")  # 确保名称完全匹配
+        else:
+            print("错误：无法找到主窗口")
 
     def generate_report(self):
         print("开始生成报告功能被点击")
         # 实际应用中会切换到报告生成与打印标签页
-        # self.parent().switch_tab("报告生成与打印")
+        main_window = self.get_main_window()
+        if main_window:
+            main_window.switch_tab("报告打印")  # 确保名称完全匹配
+        else:
+            print("错误：无法找到主窗口")
