@@ -55,7 +55,7 @@ class ReportGenerator:
         # 准备模板数据
         context = {
             'rows': self.value.to_dict(orient='records'),
-            **self.value.iloc[0].to_dict()
+            # **self.value.iloc[0].to_dict()
         }
 
 
@@ -63,14 +63,15 @@ class ReportGenerator:
         # 渲染模板
         doc.render(context)
 
-        # # 生成报告文件名
+        # 生成报告文件名
         report_name = f"{self.key[0]}_{self.key[1]}_{self.key[2]}试验报告"
         report_path = "./reports/" + report_name + ".docx"
 
-        # # 保存报告
+        # 保存报告
         doc.save(report_path)
+        
+        # 打开报告
         abs_path = os.path.abspath(report_path)
-        print(abs_path)
         os.startfile(abs_path)
 
 
