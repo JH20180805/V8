@@ -1,4 +1,6 @@
-from PySide6.QtWidgets import QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, QFileDialog, QComboBox, QLineEdit, QTableView, QHeaderView
+from PySide6.QtWidgets import (QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, 
+                             QFileDialog, QComboBox, QLineEdit, QTableView, QHeaderView,
+                             QProgressDialog, QMessageBox)
 from PySide6.QtCore import Qt, QAbstractTableModel
 from PySide6.QtGui import QFont
 from database.db_manager import DatabaseManager 
@@ -149,10 +151,39 @@ class ReportTab(QWidget):
             }
         """)  # 设置边框样式凸显
 
+        # 添加批量生成按钮
+        batch_button = QPushButton("批量生成所有报告")
+        batch_button.clicked.connect(self.generate_all_batches)
+        batch_button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        batch_button.setMaximumWidth(150)  # 限制按钮宽度
+        batch_button.setMaximumHeight(45)  # 限制按钮高度
+        batch_button.setStyleSheet("""
+            QPushButton {
+                border: 2px solid #007BFF;
+                border-radius: 6px;
+                font-weight: bold;
+                font-size: 12px;
+                padding: 4px 8px;
+                background-color: #FFFFFF;
+                color: #007BFF;
+            }
+            QPushButton:hover {
+                background-color: #E7F3FF;
+                border-color: #0056B3;
+            }
+            QPushButton:pressed {
+                background-color: #CCE7FF;
+            }
+        """)  # 蓝色主题样式
+
+        # 存储字典供批量生成使用
+        self.dic = dic
+
         layout.addWidget(label, 0, 0)
         layout.addWidget(selec, 0, 1, 1, 2)  # 下拉框占2列，显示更多内容
         layout.addWidget(view, 1, 0, 1, 3)  # 表格占据3列
-        layout.addWidget(button, 2, 0, 1, 3, alignment=Qt.AlignCenter)
+        layout.addWidget(button, 2, 0, 1, 1, alignment=Qt.AlignRight)
+        layout.addWidget(batch_button, 2, 1, 1, 2, alignment=Qt.AlignLeft)
         
         # 设置间距和拉伸比例
         layout.setVerticalSpacing(15)  # 增加垂直间距
@@ -168,3 +199,110 @@ class ReportTab(QWidget):
     def generate(self):
         self.generator = ReportGenerator(self.key, self.value)
         self.generator.generate_report()
+
+    def generate_all_batches(self):
+        """批量生成所有批次的报告"""
+        if not hasattr(self, 'dic') or not self.dic:
+            QMessageBox.warning(self, "警告", "没有可生成的批次数据")
+            return
+        
+        total_count = len(self.dic)
+        success_count = 0
+        error_count = 0
+        error_messages = []
+        
+        # 创建进度对话框
+        progress = QProgressDialog("正在生成报告...", "取消", 0, total_count, self)
+        progress.setWindowTitle("批量生成报告")
+        progress.setWindowModality(Qt.WindowModal)
+        progress.setMinimumDuration(0)  # 立即显示进度条
+        progress.resize(400, 120)
+        
+        # 设置进度条样式
+        progress.setStyleSheet("""
+            QProgressDialog {
+                background-color: #f8f9fa;
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+            }
+            QProgressBar {
+                border: 1px solid #007BFF;
+                border-radius: 4px;
+                text-align: center;
+                background-color: #e9ecef;
+            }
+            QProgressBar::chunk {
+                background-color: #007BFF;
+                border-radius: 3px;
+            }
+        """)
+        
+        current_step = 0
+        was_canceled = False
+        
+        for key, value in self.dic.items():
+            # 检查是否取消
+            if progress.wasCanceled():
+                was_canceled = True
+                break
+                
+            # 更新进度
+            current_step += 1
+            batch_name = f"{key[0]}_{key[1]}_{key[2]}"
+            progress.setLabelText(f"正在生成第 {current_step}/{total_count} 个报告：\n{batch_name}")
+            progress.setValue(current_step)
+            
+            try:
+                generator = ReportGenerator(key, value)
+                generator.generate_report()
+                success_count += 1
+                print(f"✓ 成功生成: {batch_name}")
+            except Exception as e:
+                error_count += 1
+                error_msg = f"{batch_name}: {str(e)}"
+                error_messages.append(error_msg)
+                print(f"✗ 生成失败: {error_msg}")
+        
+        progress.close()
+        
+        # 显示结果对话框
+        self.show_batch_result(success_count, error_count, error_messages, was_canceled)
+
+    def show_batch_result(self, success_count, error_count, error_messages, was_canceled):
+        """显示批量生成结果对话框"""
+        if was_canceled:
+            title = "操作已取消"
+            message = f"批量生成已取消！\n已成功生成: {success_count} 个报告"
+            icon = QMessageBox.Information
+        elif error_count == 0:
+            title = "生成完成"
+            message = f"🎉 批量生成成功完成！\n共生成 {success_count} 个报告"
+            icon = QMessageBox.Information
+        else:
+            title = "生成完成（部分失败）"
+            message = f"批量生成完成！\n✓ 成功: {success_count} 个\n✗ 失败: {error_count} 个"
+            if error_messages:
+                message += f"\n\n失败详情:\n" + "\n".join(error_messages[:5])  # 只显示前5个错误
+                if len(error_messages) > 5:
+                    message += f"\n... 还有 {len(error_messages) - 5} 个错误"
+            icon = QMessageBox.Warning
+        
+        msg_box = QMessageBox(icon, title, message, QMessageBox.Ok, self)
+        msg_box.setStyleSheet("""
+            QMessageBox {
+                background-color: #f8f9fa;
+                font-family: 'Microsoft YaHei';
+            }
+            QMessageBox QPushButton {
+                background-color: #007BFF;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 16px;
+                min-width: 80px;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #0056B3;
+            }
+        """)
+        msg_box.exec()

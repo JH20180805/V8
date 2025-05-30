@@ -69,6 +69,34 @@ class MainWindow(QWidget):
             QWidget {
                 background-color: #F8F9FA; /* Neutral Light Background */
             }
+            QTabWidget::pane {
+                border: 1px solid #DEE2E6;
+                border-radius: 4px;
+                background-color: #FFFFFF;
+                margin-top: 10px; /* tab与内容区域间距 */
+            }
+            QTabBar::tab {
+                background-color: #E9ECEF;
+                border: 1px solid #DEE2E6;
+                border-bottom: none;
+                border-top-left-radius: 6px;
+                border-top-right-radius: 6px;
+                padding: 8px 16px;
+                margin-right: 2px;
+                color: #6C757D;
+                font-weight: 500;
+            }
+            QTabBar::tab:selected {
+                background-color: #FFFFFF;
+                border-color: #007BFF;
+                color: #007BFF;
+                font-weight: 600;
+                border-bottom: 2px solid #FFFFFF; /* 连接到内容区域 */
+            }
+            QTabBar::tab:hover:!selected {
+                background-color: #F8F9FA;
+                color: #495057;
+            }
             QPushButton {
                 background-color: #FFFFFF; /* White Card Background */
                 border: 1px solid #DEE2E6; /* Light Gray Border */
