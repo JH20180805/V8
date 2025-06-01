@@ -67,8 +67,7 @@ class QuickStart(QWidget):
                 print("错误：无法找到主窗口")
 
     def view_data(self):
-        print("查看已导入数据功能被点击")
-        # 实际应用中会切换到数据预览标签页
+        # 切换到数据预览标签页
         main_window = self.get_main_window()
         if main_window:
             main_window.switch_tab("数据预览")  # 确保名称完全匹配
@@ -76,8 +75,7 @@ class QuickStart(QWidget):
             print("错误：无法找到主窗口")
 
     def generate_report(self):
-        print("开始生成报告功能被点击")
-        # 实际应用中会切换到报告生成与打印标签页
+        # 切换到报告生成与打印标签页
         main_window = self.get_main_window()
         if main_window:
             main_window.switch_tab("报告打印")  # 确保名称完全匹配

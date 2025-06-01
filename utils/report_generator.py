@@ -4,6 +4,7 @@
 import os
 import datetime
 from docxtpl import DocxTemplate
+import ast
 
 
 class ReportGenerator:
@@ -51,11 +52,16 @@ class ReportGenerator:
         doc = DocxTemplate(template_path)
 
         self.value['序号'] = range(1, len(self.value) + 1)
+        # 将含多个试验数据的项转换为列表
+        try:
+            self.value['试验数据'] = self.value['试验数据'].apply(ast.literal_eval)
+        except Exception as e:
+            pass
          
         # 准备模板数据
         context = {
             'rows': self.value.to_dict(orient='records'),
-            # **self.value.iloc[0].to_dict()
+            **self.value.iloc[0].to_dict()  #对第一行字典进行解包，使得可以直接用{{样品名称}}获得通用信息
         }
 
 
