@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import (QWidget, QGridLayout, QPushButton, QLabel, QSizePolicy, 
-                             QFileDialog, QComboBox, QLineEdit, QTableView, QHeaderView,
-                             QProgressDialog, QMessageBox)
+QFileDialog, QComboBox, QLineEdit, QTableView, QHeaderView,
+QProgressDialog, QMessageBox, QHBoxLayout)
 from PySide6.QtCore import Qt, QAbstractTableModel
 from PySide6.QtGui import QFont
 from database.db_manager import DatabaseManager 
@@ -130,8 +130,18 @@ class ReportTab(QWidget):
         # Add message_label to occupy the same space as view, toggle visibility
         self.grid_layout.addWidget(self.message_label, 1, 0, 1, 3, Qt.AlignCenter)
         self.grid_layout.addWidget(self.view, 1, 0, 1, 3) # view will be shown/hidden by refresh_data
-        self.grid_layout.addWidget(self.print_button, 2, 0, 1, 1, alignment=Qt.AlignRight)
-        self.grid_layout.addWidget(self.batch_print_button, 2, 1, 1, 2, alignment=Qt.AlignLeft)
+        # 创建水平布局来居中显示两个按钮
+        button_layout = QHBoxLayout()
+        button_layout.addStretch()  # 左侧弹簧
+        button_layout.addWidget(self.print_button)
+        button_layout.addSpacing(20)  # 按钮间距
+        button_layout.addWidget(self.batch_print_button)
+        button_layout.addStretch()  # 右侧弹簧
+        
+        # 创建一个容器widget来容纳按钮布局
+        button_container = QWidget()
+        button_container.setLayout(button_layout)
+        self.grid_layout.addWidget(button_container, 2, 0, 1, 3)
         
         self.grid_layout.setVerticalSpacing(15)
         self.grid_layout.setHorizontalSpacing(10)

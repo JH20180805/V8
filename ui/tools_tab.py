@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QMessageBox, QHeaderView, QStyledItemDelegate, QFileDialog, QLabel # Added QLabel
 )
 from PySide6.QtCore import Qt
-from PySide6.QtSql import QSqlTableModel, QSqlDatabase
+from PySide6.QtSql import QSqlTableModel, QSqlDatabase, QSqlQuery
 from PySide6.QtGui import QFont
 from database.db_manager import DatabaseManager
 from utils.excel_handler import ExcelHandler
@@ -54,11 +54,11 @@ class ToolTab(QWidget):
 
         # UI Elements for Editing
         button_layout = QHBoxLayout()
-        self.add_button = QPushButton("添加行") # Changed from "Add Row"
-        self.delete_button = QPushButton("删除行") # Changed from "Delete Row"
-        self.export_button = QPushButton("导出到Excel") # Changed from "Export to Excel"
-        self.save_button = QPushButton("保存更改") # Changed from "Save Changes"
-        self.revert_button = QPushButton("撤销更改") # Changed from "Revert Changes"
+        self.add_button = QPushButton("添加") 
+        self.delete_button = QPushButton("删除") 
+        self.export_button = QPushButton("导出") 
+        self.save_button = QPushButton("保存") 
+        self.revert_button = QPushButton("撤销")
 
         # Apply compact styling to buttons
         compact_font = QFont("Microsoft YaHei", 9) # Or another suitable font
@@ -71,19 +71,38 @@ class ToolTab(QWidget):
         ]
 
         for button in buttons_to_style:
-            button.setFont(compact_font)
-            # Override global style for padding and set a max width
-            # Keep other aspects of default button styling if possible,
-            # or define a more complete stylesheet if needed.
-            button.setStyleSheet("padding: 4px 8px; margin: 2px;") # Reduced padding, small margin
-            button.setMaximumWidth(130) # Max width for these buttons
+            button.setFont(QFont("Microsoft YaHei", 9))  # 合适的字体大小
+            # 移除宽度和高度限制，让按钮自适应文字大小
+            button.setSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+            button.setStyleSheet("""
+                QPushButton {
+                    font-size: 9pt; /* 明确指定字体大小 */
+                    padding: 5px 10px; /* 减小内边距以适应小字体 */
+                    min-width: 0px; /* 允许按钮根据内容和padding自动调整宽度 */
+                    max-width: none; /* 如果需要，也可以移除最大宽度限制 */
+                    margin-bottom: 0px; /* 如果全局的margin过大，也在这里调整 */
+                    /* 其他在全局样式中定义的属性如 background-color, border, color 会被继承 */
+                }
+                QPushButton:hover {
+                    background-color: #E9ECEF; /* 可以保留或修改hover效果 */
+                    border-color: #007BFF;
+                }
+                QPushButton:pressed {
+                    background-color: #DEE2E6; /* 可以保留或修改pressed效果 */
+                }
+            """)
 
+        # 一行布局，按钮更小
+        button_layout.setSpacing(8)  # 较小间距
+        button_layout.setContentsMargins(10, 5, 10, 5)
+        
         button_layout.addWidget(self.add_button)
         button_layout.addWidget(self.delete_button)
         button_layout.addWidget(self.export_button)
-        button_layout.addStretch()
+        button_layout.addStretch()  # 弹性空间分隔左右按钮组
         button_layout.addWidget(self.save_button)
         button_layout.addWidget(self.revert_button)
+        
         layout.addLayout(button_layout)
 
         # Connect Buttons to Model Actions
@@ -226,7 +245,6 @@ if __name__ == '__main__':
             return self.db
 
         def _create_tools_table(self):
-            from PySide6.QtSql import QSqlQuery
             query = QSqlQuery(self.db)
             if "tools" not in self.db.tables(): # Check before creating
                 create_sql = """CREATE TABLE tools (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, value TEXT);"""

@@ -23,23 +23,24 @@ class MainWindow(QWidget):
             print(f"无法加载图标: {e}. 请确保图标文件存在且路径正确。")
             # 如果图标加载失败，可以设置一个默认图标或不设置
 
-        # 设置窗口初始大小 (可以先设置，再居中)
-        self.setGeometry(100, 100, 600, 400)
-
-        # 使窗口居中
-        self.center_window()
+        # 设置窗口初始大小
+        self.resize(800, 600)  # 更合适的窗口尺寸
+        self.setMinimumSize(800, 600)  # 设置最小尺寸
 
         self.db_manager = DatabaseManager() # 创建 DatabaseManager 实例
         self.setup_ui()
+        
+        # 界面设置完成后再居中
+        self.center_window()
 
     def center_window(self):
         # 获取屏幕的几何信息
         screen = QGuiApplication.primaryScreen().geometry()
         # 获取窗口的几何信息
-        window = self.frameGeometry()
+        window_rect = self.geometry()
         # 计算窗口居中后的左上角坐标
-        x = (screen.width() - window.width()) // 2
-        y = (screen.height() - window.height()) // 2
+        x = (screen.width() - window_rect.width()) // 2
+        y = (screen.height() - window_rect.height()) // 2
         # 移动窗口到计算出的位置
         self.move(x, y)
 
