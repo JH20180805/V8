@@ -89,8 +89,9 @@ class ReportTab(QWidget):
         self.view.setFont(QFont("Microsoft YaHei", 9))
 
         header = self.view.horizontalHeader()
-        header.setSectionResizeMode(QHeaderView.ResizeToContents)
-        header.setStretchLastSection(True)
+        # Changed from ResizeToContents to Interactive to allow user resizing and prevent content-based expansion
+        header.setSectionResizeMode(QHeaderView.Interactive)
+        header.setStretchLastSection(True) # Keep last section stretched
 
         self.view.verticalHeader().setDefaultSectionSize(30)
         self.view.verticalHeader().setVisible(False)
