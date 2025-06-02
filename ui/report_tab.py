@@ -118,6 +118,9 @@ class ReportTab(QWidget):
         self.message_label.setAlignment(Qt.AlignCenter)
         self.message_label.setFont(QFont("Microsoft YaHei", 12, QFont.Bold)) # Adjusted font
         self.message_label.setStyleSheet("color: grey; padding: 20px;")
+        self.message_label.setWordWrap(True)
+        # Policy: Expanding horizontally, preferred vertically (adjusts to content height)
+        self.message_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         self.message_label.setVisible(False) # Initially hidden
 
         # Add widgets to self.grid_layout

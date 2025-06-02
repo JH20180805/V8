@@ -45,16 +45,37 @@ class ToolTab(QWidget):
         self.message_label = QLabel("The 'tools' table does not exist in the database.\nPlease import data via the 'Quick Start' tab to create and populate the table.")
         self.message_label.setAlignment(Qt.AlignCenter)
         self.message_label.setFont(QFont("Microsoft YaHei", 10))
-        self.message_label.setStyleSheet("color: grey;")
+        self.message_label.setStyleSheet("color: grey; padding: 10px;") # Added padding
+        self.message_label.setWordWrap(True)
+        # Policy: Expanding horizontally, preferred vertically (adjusts to content height)
+        self.message_label.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         layout.addWidget(self.message_label) # Add to layout, visibility will be toggled
 
         # UI Elements for Editing
         button_layout = QHBoxLayout()
-        self.add_button = QPushButton("Add Row")
-        self.delete_button = QPushButton("Delete Row")
-        self.export_button = QPushButton("Export to Excel")
-        self.save_button = QPushButton("Save Changes")
-        self.revert_button = QPushButton("Revert Changes")
+        self.add_button = QPushButton("添加行") # Changed from "Add Row"
+        self.delete_button = QPushButton("删除行") # Changed from "Delete Row"
+        self.export_button = QPushButton("导出到Excel") # Changed from "Export to Excel"
+        self.save_button = QPushButton("保存更改") # Changed from "Save Changes"
+        self.revert_button = QPushButton("撤销更改") # Changed from "Revert Changes"
+
+        # Apply compact styling to buttons
+        compact_font = QFont("Microsoft YaHei", 9) # Or another suitable font
+        buttons_to_style = [
+            self.add_button,
+            self.delete_button,
+            self.save_button,
+            self.revert_button,
+            self.export_button
+        ]
+
+        for button in buttons_to_style:
+            button.setFont(compact_font)
+            # Override global style for padding and set a max width
+            # Keep other aspects of default button styling if possible,
+            # or define a more complete stylesheet if needed.
+            button.setStyleSheet("padding: 4px 8px; margin: 2px;") # Reduced padding, small margin
+            button.setMaximumWidth(130) # Max width for these buttons
 
         button_layout.addWidget(self.add_button)
         button_layout.addWidget(self.delete_button)
