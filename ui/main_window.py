@@ -11,6 +11,7 @@ from .report_tab import ReportTab
 
 class MainWindow(QWidget):
     def __init__(self):
+        print("MainWindow.__init__: Starting.")
         super().__init__()
         self.setWindowTitle("工器具试验报告生成打印")
 
@@ -53,16 +54,31 @@ class MainWindow(QWidget):
     def setup_ui(self):
         layout = QVBoxLayout(self)
 
+        print("MainWindow.setup_ui: Creating QTabWidget...")
         self.tab_widget = QTabWidget()
         self.tab_widget.setFont(QFont("Microsoft YaHei", 10))
-        self.quick_tab = QuickStart(ExcelHandler, self.db_manager) # 传递实例
-        self.tool_tab = ToolTab(self.db_manager) # 传递实例
-        self.report_tab = ReportTab(self.db_manager) # 传递实例
+        print("MainWindow.setup_ui: QTabWidget created.")
+
+        print("MainWindow.setup_ui: Creating QuickStart tab...")
+        self.quick_tab = QuickStart(ExcelHandler, self.db_manager, self)
+        print("MainWindow.setup_ui: QuickStart tab created.")
+
+        print("MainWindow.setup_ui: Creating ToolTab...")
+        self.tool_tab = ToolTab(self.db_manager)
+        print("MainWindow.setup_ui: ToolTab created.")
+
+        print("MainWindow.setup_ui: Creating ReportTab...")
+        self.report_tab = ReportTab(self.db_manager)
+        print("MainWindow.setup_ui: ReportTab created.")
+
+        print("MainWindow.setup_ui: Adding tabs to QTabWidget...")
         self.tab_widget.addTab(self.quick_tab, "快速开始")
         self.tab_widget.addTab(self.tool_tab, "数据预览")
         self.tab_widget.addTab(self.report_tab, "报告打印")
-        layout.addWidget(self.tab_widget)
+        print("MainWindow.setup_ui: Tabs added.")
 
+        layout.addWidget(self.tab_widget)
+        print("MainWindow.setup_ui: QTabWidget added to layout.")
 
         # 设置全局样式
         self.setStyleSheet("""
@@ -128,9 +144,15 @@ class MainWindow(QWidget):
             index: 选项卡索引
         """
         # 刷新当前选项卡的数据
-        current_tab = self.tab_widget.widget(index)
-        if hasattr(current_tab, 'refresh_data'):
-            current_tab.refresh_data()
+        current_tab_widget = self.tab_widget.widget(index)
+        tab_name = self.tab_widget.tabText(index)
+        print(f"MainWindow: Tab changed to '{tab_name}' (index {index}). Checking for refresh_data.")
+        if hasattr(current_tab_widget, 'refresh_data') and callable(current_tab_widget.refresh_data):
+            print(f"MainWindow: Calling refresh_data() on tab '{tab_name}'.")
+            current_tab_widget.refresh_data()
+            print(f"MainWindow: Finished calling refresh_data() on tab '{tab_name}'.")
+        else:
+            print(f"MainWindow: Tab '{tab_name}' does not have a callable refresh_data method.")
 
 
 

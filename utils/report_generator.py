@@ -73,6 +73,12 @@ class ReportGenerator:
         report_name = f"{self.key[0]}_{self.key[1]}_{self.key[2]}试验报告"
         report_path = "./reports/" + report_name + ".docx"
 
+        # Ensure the reports directory exists
+        report_dir = os.path.dirname(report_path)
+        if not os.path.exists(report_dir):
+            os.makedirs(report_dir, exist_ok=True)
+            print(f"ReportGenerator: Created directory {report_dir}")
+
         # 保存报告
         doc.save(report_path)
         

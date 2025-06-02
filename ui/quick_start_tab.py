@@ -1,12 +1,14 @@
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSizePolicy, QFileDialog
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
+from PySide6.QtWidgets import QMessageBox # Added for QMessageBox
 
 class QuickStart(QWidget):
-    def __init__(self, ExcelHandler, DatabaseManager):
+    def __init__(self, excel_handler_class, db_manager_instance, main_window_instance): # Modified signature
         super().__init__()
-        self.ExcelHandler = ExcelHandler
-        self.DatabaseManager = DatabaseManager
+        self.excel_handler_class = excel_handler_class # Store the class type
+        self.db_manager = db_manager_instance     # Store the DatabaseManager instance
+        self.main_window = main_window_instance     # Store the MainWindow instance
         # 主布局
         main_layout = QVBoxLayout()
         main_layout.setAlignment(Qt.AlignCenter) # 整体居中
@@ -32,15 +34,7 @@ class QuickStart(QWidget):
 
         self.setLayout(main_layout)
     
-    def get_main_window(self):
-            """向上遍历父对象直到找到MainWindow实例"""
-            parent = self.parent()
-            while parent is not None:
-                # 检查是否是MainWindow（通过特定属性判断）
-                if hasattr(parent, 'tab_widget') and hasattr(parent, 'switch_tab'):
-                    return parent
-                parent = parent.parent()
-            return None
+    # Removed get_main_window method as self.main_window is now directly available.
 
     def create_button(self, text, slot, layout):
         button = QPushButton(text)
@@ -50,34 +44,64 @@ class QuickStart(QWidget):
         layout.addWidget(button, alignment=Qt.AlignCenter) # 按钮在布局中也居中
     
     def import_excel(self):
-        # 实际应用中会触发文件选择对话框
-        print("导入 Excel 文件功能被点击")
-        # 这里可以添加文件选择对话框的代码，例如：
-        file_path, _ = QFileDialog.getOpenFileName(self, "选择 Excel 文件", "", "Excel Files (*.xlsx *.xls)")
+        options = QFileDialog.Options()
+        # options |= QFileDialog.DontUseNativeDialog # Uncomment if native dialog causes issues
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "选择 Excel 文件",
+            "",
+            "Excel Files (*.xlsx *.xls);;All Files (*)",
+            options=options
+        )
+
         if file_path:
-            print(f"选择了文件: {file_path}")
-            db_mag = self.DatabaseManager
-            excel_hand = self.ExcelHandler(file_path, db_mag.conn)
-            excel_hand.handler()
-            # 使用更可靠的方式切换选项卡
-            main_window = self.get_main_window()
-            if main_window:
-                main_window.switch_tab("数据预览")  # 确保名称完全匹配
+            # self.excel_handler_class was stored from __init__
+            # self.db_manager was stored from __init__
+            excel_handler_instance = self.excel_handler_class(self.db_manager)
+            success = excel_handler_instance.handler(file_path)
+
+            if success:
+                QMessageBox.information(self, "导入成功",
+                                        f"数据已成功从\n{file_path}\n导入！\n\n其他数据标签页将尝试刷新。")
+
+                # Refresh ToolTab (Data Preview) if it exists and has refresh_data
+                if hasattr(self.main_window, 'tool_tab') and \
+                   hasattr(self.main_window.tool_tab, 'refresh_data') and \
+                   callable(self.main_window.tool_tab.refresh_data):
+                    print("QuickStart: Refreshing ToolTab...")
+                    self.main_window.tool_tab.refresh_data()
+                else:
+                    print("QuickStart: ToolTab or its refresh_data method not found/callable on MainWindow.")
+
+                # Refresh ReportTab if it exists and has refresh_data
+                if hasattr(self.main_window, 'report_tab') and \
+                   hasattr(self.main_window.report_tab, 'refresh_data') and \
+                   callable(self.main_window.report_tab.refresh_data):
+                    print("QuickStart: Refreshing ReportTab...")
+                    self.main_window.report_tab.refresh_data()
+                else:
+                    print("QuickStart: ReportTab or its refresh_data method not found/callable on MainWindow.")
+
+                # Switch to the ToolTab (Data Preview)
+                if hasattr(self.main_window, 'switch_tab'):
+                    self.main_window.switch_tab("数据预览")
+                else:
+                    print("QuickStart: switch_tab method not found on MainWindow.")
+
             else:
-                print("错误：无法找到主窗口")
+                QMessageBox.warning(self, "导入失败",
+                                    f"无法从\n{file_path}\n导入数据。\n\n请检查文件格式或内容，并查看控制台日志获取详细信息。")
 
     def view_data(self):
         # 切换到数据预览标签页
-        main_window = self.get_main_window()
-        if main_window:
-            main_window.switch_tab("数据预览")  # 确保名称完全匹配
+        if hasattr(self.main_window, 'switch_tab'):
+            self.main_window.switch_tab("数据预览")
         else:
-            print("错误：无法找到主窗口")
+            print("QuickStart: switch_tab method not found on MainWindow for view_data.")
 
     def generate_report(self):
         # 切换到报告生成与打印标签页
-        main_window = self.get_main_window()
-        if main_window:
-            main_window.switch_tab("报告打印")  # 确保名称完全匹配
+        if hasattr(self.main_window, 'switch_tab'):
+            self.main_window.switch_tab("报告打印")
         else:
-            print("错误：无法找到主窗口")
+            print("QuickStart: switch_tab method not found on MainWindow for generate_report.")
